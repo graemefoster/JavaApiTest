@@ -28,13 +28,6 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2020-06-01' = {
 resource appService 'Microsoft.Web/sites@2022-03-01' = {
   name: webSiteName
   location: location
-  identity: {
-    type: 'SystemAssigned'
-  }
-  tags: {
-    displayName: 'Website'
-    ProjectName: 'ContosoUniversity'
-  }
   properties: {
     serverFarmId: appServicePlan.id
     httpsOnly: true
@@ -73,7 +66,7 @@ resource appServiceLogging 'Microsoft.Web/sites/config@2020-06-01' = {
   properties: {
     applicationLogs: {
       fileSystem: {
-        level: 'Warning'
+        level: 'Debug'
       }
     }
     httpLogs: {
@@ -94,15 +87,11 @@ resource appServiceLogging 'Microsoft.Web/sites/config@2020-06-01' = {
 resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2020-03-01-preview' = {
   name: logAnalyticsName
   location: location
-  tags: {
-    displayName: 'Log Analytics'
-    ProjectName: 'ContosoUniversity'
-  }
   properties: {
     sku: {
       name: 'PerGB2018'
     }
-    retentionInDays: 120
+    retentionInDays: 30
   }
 }
 
@@ -110,10 +99,6 @@ resource appInsights 'microsoft.insights/components@2020-02-02-preview' = {
   name: appInsightName
   location: location
   kind: 'string'
-  tags: {
-    displayName: 'AppInsight'
-    ProjectName: 'ContosoUniversity'
-  }
   properties: {
     Application_Type: 'web'
     WorkspaceResourceId: logAnalyticsWorkspace.id
