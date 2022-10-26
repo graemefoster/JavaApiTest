@@ -1,16 +1,13 @@
 param skuName string = 'S1'
 param skuCapacity int = 1
-param servicePlan string
 
 param appName string
-param insightName string
-param analyticsName string
 param location string = resourceGroup().location
 
-var appServicePlanName = toLower(servicePlan)
 var webSiteName = toLower(appName)
-var appInsightName = toLower(insightName)
-var logAnalyticsName = toLower(analyticsName)
+var appServicePlanName = toLower('${appName}-asp')
+var appInsightName = toLower('${appName}-appi')
+var logAnalyticsName = toLower('${appName}-loga')
 
 resource appServicePlan 'Microsoft.Web/serverfarms@2020-06-01' = {
   name: appServicePlanName
@@ -33,7 +30,9 @@ resource appService 'Microsoft.Web/sites@2022-03-01' = {
     httpsOnly: true
     siteConfig: {
       minTlsVersion: '1.2'
-      netFrameworkVersion: 'v6.0'
+      javaVersion: '17'
+      javaContainer: 'JAVA'
+      javaContainerVersion: 'SE'
       appSettings: [
         {
           name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
@@ -54,12 +53,11 @@ resource appService 'Microsoft.Web/sites@2022-03-01' = {
         {
           name: 'XDT_MicrosoftApplicationInsights_BaseExtensions'
           value: '~1'
-        }      
+        }
       ]
     }
   }
 }
-
 
 resource appServiceLogging 'Microsoft.Web/sites/config@2020-06-01' = {
   name: '${appService.name}/logs'
@@ -104,4 +102,3 @@ resource appInsights 'microsoft.insights/components@2020-02-02-preview' = {
     WorkspaceResourceId: logAnalyticsWorkspace.id
   }
 }
-
